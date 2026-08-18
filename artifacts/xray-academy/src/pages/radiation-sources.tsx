@@ -2055,6 +2055,13 @@ export default function RadiationSourcesPage({ initialSection }: { initialSectio
             <ColumnToggle collapsed={false} onClick={nav.toggle} label="sections" />
           </div>
           <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mt-2 truncate">{ar ? PAGE_STRINGS_AR.encyclopedia : 'Engineering Encyclopedia'}</p>
+          {/* Site author / creator credit */}
+          <div className="mt-2 pt-2 border-t border-border/60" dir={ar ? 'rtl' : 'ltr'}>
+            <p className="text-[9px] text-muted-foreground leading-tight">{ar ? 'إعداد' : 'Created by'}</p>
+            <p className="text-xs font-semibold text-purple-300 leading-tight">{ar ? 'محمد نعمان' : 'Mohamed Noaman'}</p>
+            <p className="text-[10px] text-muted-foreground leading-snug">{ar ? 'محاضر ومدرب' : 'Professor of Practice'}</p>
+            <p className="text-[10px] text-muted-foreground leading-snug">{ar ? 'أنظمة أمن وإشعاع' : 'Security & Radiation Systems'}</p>
+          </div>
         </div>
 
         <ScrollArea className="flex-1">
