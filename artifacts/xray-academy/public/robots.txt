@@ -3,4 +3,4 @@ Allow: /
 Disallow: /api/
 Disallow: /admin
 
-Sitemap: https://translation-studio.onrender.com/sitemap.xml
+Sitemap: https://radiation-lab.onrender.com/sitemap.xml
