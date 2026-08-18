@@ -4,7 +4,7 @@
 # marked `sync: false` (ADMIN_KEY + provider API keys).
 services:
   - type: web
-    name: xray-radiation
+    name: radiation-lab
     env: docker
     plan: starter                 # ~$7/mo, always-on (free tier sleeps)
     dockerfilePath: ./Dockerfile
@@ -33,7 +33,7 @@ services:
         value: "true"
       # Lock CORS to the site's own origin (no wildcard).
       - key: CORS_ALLOW_ORIGINS
-        value: "https://xray-radiation.onrender.com"
+        value: "https://radiation-lab.onrender.com"
       # ── Google sign-in + free-tier quotas ──────────────────────────────────
       # Off for now: the site stays fully open while we measure demand. Flip to
       # "true" (after setting the two GOOGLE_* secrets below) to switch on the
@@ -41,7 +41,7 @@ services:
       - key: AUTH_ENABLED
         value: "false"
       - key: PUBLIC_BASE_URL
-        value: "https://xray-radiation.onrender.com"
+        value: "https://radiation-lab.onrender.com"
       - key: ANON_FREE_TRANSLATIONS
         value: "1"
       - key: ACCOUNT_FREE_TRANSLATIONS
