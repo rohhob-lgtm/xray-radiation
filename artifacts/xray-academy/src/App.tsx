@@ -12,7 +12,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <RadiationSourcesPage initialSection="courses" />
+        <RadiationSourcesPage initialSection="learn" />
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>

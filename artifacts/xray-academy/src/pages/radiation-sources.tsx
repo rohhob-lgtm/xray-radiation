@@ -2022,7 +2022,9 @@ export default function RadiationSourcesPage({ initialSection }: { initialSectio
   const nav = useResizableColumn({ key: 'radiation-nav', initial: 240, min: 170, max: 460 });
   const [lang] = useLessonLang();
   const ar = lang === 'ar';
-  const section = SECTIONS.find(s => s.id === activeSection)!;
+  // Fall back to the first section if an unknown id is supplied, so a bad
+  // initialSection can never crash the whole page (blank screen).
+  const section = SECTIONS.find(s => s.id === activeSection) ?? SECTIONS[0];
   const meta = SECTION_META[activeSection] || { desc: '', refs: [] };
 
   // Build a map from group id → sections in that group
