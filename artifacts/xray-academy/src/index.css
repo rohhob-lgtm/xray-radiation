@@ -1,0 +1,167 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-card-border: hsl(var(--card-border));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-popover-border: hsl(var(--popover-border));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-research: hsl(var(--research));
+  --color-research-foreground: hsl(var(--research-foreground));
+
+  --color-sidebar: hsl(var(--sidebar));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  /* Dark mode by default - Deep Navy #0D1B2A */
+  --background: 211 53% 11%;
+  --foreground: 210 40% 98%;
+  --border: 214 52% 24%;
+  
+  --card: 219 37% 17%;
+  --card-foreground: 210 40% 98%;
+  --card-border: 214 52% 24%;
+  
+  --popover: 219 37% 17%;
+  --popover-foreground: 210 40% 98%;
+  --popover-border: 214 52% 24%;
+  
+  /* Electric Blue */
+  --primary: 221 83% 53%;
+  --primary-foreground: 210 40% 98%;
+  
+  --secondary: 212 29% 36%;
+  --secondary-foreground: 210 40% 98%;
+  
+  --muted: 219 37% 17%;
+  --muted-foreground: 215 20% 65%;
+  
+  --accent: 212 29% 36%;
+  --accent-foreground: 210 40% 98%;
+  
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 40% 98%;
+
+  /* Amber - Research */
+  --research: 38 92% 50%;
+  --research-foreground: 211 53% 11%;
+  
+  --input: 212 29% 36%;
+  --ring: 221 83% 53%;
+  
+  --sidebar: 211 53% 11%;
+  --sidebar-foreground: 210 40% 98%;
+  --sidebar-border: 214 52% 24%;
+  --sidebar-primary: 221 83% 53%;
+  --sidebar-primary-foreground: 210 40% 98%;
+  --sidebar-accent: 219 37% 17%;
+  --sidebar-accent-foreground: 210 40% 98%;
+  --sidebar-ring: 221 83% 53%;
+  
+  --radius: 0.5rem;
+}
+
+.dark {
+  /* Same, dark mode default */
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    color-scheme: dark;
+  }
+}
+
+/* ── RTL utility (reusable across the app) ──────────────────────────────
+   Applied to any container whose text content was detected as Arabic/Hebrew.
+   unicode-bidi: plaintext lets each nested block resolve its own direction
+   from its own content (so embedded numbers/Latin words stay LTR-readable
+   without extra markup), while direction: rtl drives layout (list markers,
+   table columns, blockquote rule side) to the right. */
+.rtl-content {
+  direction: rtl;
+  text-align: right;
+  unicode-bidi: plaintext;
+}
+
+.rtl-content :where(p, h1, h2, h3, h4, h5, h6, li, blockquote, figcaption, caption, td, th, dt, dd) {
+  direction: rtl;
+  text-align: right;
+  unicode-bidi: plaintext;
+}
+
+.rtl-content :where(ul, ol) {
+  padding-inline-start: 1.5em;
+  padding-inline-end: 0;
+}
+
+.rtl-content table {
+  direction: rtl;
+}
+
+.rtl-content blockquote {
+  border-inline-start-width: 2px;
+  border-inline-end-width: 0;
+  padding-inline-start: 1em;
+  padding-inline-end: 0;
+}
+
+/* Code stays LTR even inside RTL prose — source code, numbers and captions
+   inside a fenced block are conventionally left-to-right regardless of the
+   surrounding prose language. */
+.rtl-content :where(pre, code) {
+  direction: ltr;
+  text-align: left;
+  unicode-bidi: embed;
+}
+
+.rtl-content pre :where(code) {
+  text-align: left;
+}

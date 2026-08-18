@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin
+
+Sitemap: https://translation-studio.onrender.com/sitemap.xml

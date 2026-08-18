@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "backend",
+      "runtimeExecutable": "cmd.exe",
+      "runtimeArgs": [
+        "/c",
+        "cd /d backend && .venv\\Scripts\\python.exe -m uvicorn main:app --host 127.0.0.1 --port 8001"
+      ],
+      "port": 8001
+    },
+    {
+      "name": "frontend",
+      "runtimeExecutable": "cmd.exe",
+      "runtimeArgs": [
+        "/c",
+        "cd /d artifacts\\xray-academy && set FRONTEND_PORT=5174 && set PORT=5174 && set BASE_PATH=/ && set BACKEND_PORT=8001 && node_modules\\.bin\\vite.cmd --config vite.config.ts --host 0.0.0.0 --strictPort"
+      ],
+      "port": 5174
+    }
+  ]
+}

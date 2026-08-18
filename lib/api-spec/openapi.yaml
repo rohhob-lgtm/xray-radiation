@@ -1,0 +1,710 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.2.0
+  description: X-Ray Academy AI Assistant API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+  - name: auth
+  - name: chat
+  - name: linkedin
+  - name: upload
+  - name: providers
+  - name: conversations
+  - name: rag
+  - name: research
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /auth/user:
+    get:
+      operationId: getCurrentAuthUser
+      tags: [auth]
+      summary: Get the currently authenticated user
+      responses:
+        "200":
+          description: Authenticated user info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurrentUser"
+        "401":
+          description: Not authenticated
+
+  /providers:
+    get:
+      operationId: listProviders
+      tags: [providers]
+      summary: List all AI providers
+      responses:
+        "200":
+          description: List of AI providers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AIProvider"
+
+  /providers/{providerId}/activate:
+    post:
+      operationId: activateProvider
+      tags: [providers]
+      summary: Activate an AI provider
+      parameters:
+        - name: providerId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProviderActivation"
+      responses:
+        "200":
+          description: Provider activated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AIProvider"
+        "404":
+          description: Provider not found
+
+  /conversations:
+    get:
+      operationId: listConversations
+      tags: [conversations]
+      summary: List all conversations
+      responses:
+        "200":
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Conversation"
+    post:
+      operationId: createConversation
+      tags: [conversations]
+      summary: Create a new conversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConversationInput"
+      responses:
+        "201":
+          description: Conversation created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conversation"
+
+  /conversations/{conversationId}:
+    get:
+      operationId: getConversation
+      tags: [conversations]
+      summary: Get a conversation with its messages
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Conversation with messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationWithMessages"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteConversation
+      tags: [conversations]
+      summary: Delete a conversation
+      parameters:
+        - name: conversationId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  /chat:
+    post:
+      operationId: sendChatMessage
+      tags: [chat]
+      summary: Send a message and receive AI response
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatMessageInput"
+      responses:
+        "200":
+          description: AI response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatResponse"
+
+  /linkedin/generate:
+    post:
+      operationId: generateLinkedInPost
+      tags: [linkedin]
+      summary: Generate a professional LinkedIn post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LinkedInPostInput"
+      responses:
+        "200":
+          description: Generated LinkedIn post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LinkedInPost"
+
+  /linkedin/posts:
+    get:
+      operationId: listLinkedInPosts
+      tags: [linkedin]
+      summary: List saved LinkedIn posts
+      responses:
+        "200":
+          description: List of posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LinkedInPost"
+
+  /linkedin/posts/{postId}:
+    delete:
+      operationId: deleteLinkedInPost
+      tags: [linkedin]
+      summary: Delete a LinkedIn post
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  /upload/analyze:
+    post:
+      operationId: analyzeXrayImage
+      tags: [upload]
+      summary: Analyze an X-ray security image
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/XrayAnalysisInput"
+      responses:
+        "200":
+          description: Analysis results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/XrayAnalysis"
+
+  /upload/analyses:
+    get:
+      operationId: listXrayAnalyses
+      tags: [upload]
+      summary: List recent X-ray analyses
+      responses:
+        "200":
+          description: List of analyses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/XrayAnalysis"
+
+  /upload/analyses/{analysisId}:
+    delete:
+      operationId: deleteXrayAnalysis
+      tags: [upload]
+      summary: Delete an X-ray analysis
+      parameters:
+        - name: analysisId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  /rag/documents:
+    get:
+      operationId: listRagDocuments
+      tags: [rag]
+      summary: List knowledge base documents
+      responses:
+        "200":
+          description: List of documents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RagDocument"
+    post:
+      operationId: uploadRagDocument
+      tags: [rag]
+      summary: Add a document to the knowledge base
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RagDocumentInput"
+      responses:
+        "201":
+          description: Document added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RagDocument"
+
+  /rag/documents/{documentId}:
+    patch:
+      operationId: updateRagDocument
+      tags: [rag]
+      summary: Update a knowledge base document's title, type, or content
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RagDocumentUpdate"
+      responses:
+        "200":
+          description: Updated document
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RagDocument"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteRagDocument
+      tags: [rag]
+      summary: Delete a knowledge base document
+      parameters:
+        - name: documentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  /research/modes:
+    get:
+      operationId: listResearchModes
+      tags: [research]
+      summary: List available research generation modes
+      responses:
+        "200":
+          description: List of research modes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ResearchMode"
+
+  /research/generate:
+    post:
+      operationId: generateResearch
+      tags: [research]
+      summary: Stream AI-generated research content (SSE)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResearchInput"
+      responses:
+        "200":
+          description: Server-Sent Event stream of generated content
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
+  /research/outputs:
+    get:
+      operationId: listResearchOutputs
+      tags: [research]
+      summary: List saved research outputs
+      responses:
+        "200":
+          description: List of research outputs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ResearchOutput"
+
+  /research/outputs/{outputId}:
+    delete:
+      operationId: deleteResearchOutput
+      tags: [research]
+      summary: Delete a saved research output
+      parameters:
+        - name: outputId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+
+    CurrentUser:
+      type: object
+      required: [id, username, name]
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        name:
+          type: string
+        profile_image:
+          type: ["string", "null"]
+
+    AIProvider:
+      type: object
+      required: [id, name, type, is_configured, is_active, description]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum: [openai, ollama, copilot, mock]
+        description:
+          type: string
+        is_configured:
+          type: boolean
+        is_active:
+          type: boolean
+        model:
+          type: ["string", "null"]
+
+    ProviderActivation:
+      type: object
+      required: [api_key]
+      properties:
+        api_key:
+          type: string
+        base_url:
+          type: ["string", "null"]
+        model:
+          type: ["string", "null"]
+
+    Conversation:
+      type: object
+      required: [id, title, created_at, message_count]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        created_at:
+          type: string
+        message_count:
+          type: integer
+        last_message:
+          type: ["string", "null"]
+
+    ConversationInput:
+      type: object
+      properties:
+        title:
+          type: string
+
+    ConversationWithMessages:
+      type: object
+      required: [id, title, created_at, messages]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        created_at:
+          type: string
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/Message"
+
+    Message:
+      type: object
+      required: [id, role, content, created_at]
+      properties:
+        id:
+          type: string
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+        image_url:
+          type: ["string", "null"]
+        created_at:
+          type: string
+
+    ChatMessageInput:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+        conversation_id:
+          type: ["string", "null"]
+        image_base64:
+          type: ["string", "null"]
+        image_filename:
+          type: ["string", "null"]
+
+    ChatResponse:
+      type: object
+      required: [message, conversation_id]
+      properties:
+        message:
+          type: string
+        conversation_id:
+          type: string
+        provider_used:
+          type: string
+
+    LinkedInPostInput:
+      type: object
+      required: [topic]
+      properties:
+        topic:
+          type: string
+        tone:
+          type: string
+          enum: [professional, educational, thought_leadership, case_study, tips]
+        length:
+          type: string
+          enum: [short, medium, long]
+        keywords:
+          type: array
+          items:
+            type: string
+        include_hashtags:
+          type: boolean
+
+    LinkedInPost:
+      type: object
+      required: [id, topic, content, created_at]
+      properties:
+        id:
+          type: string
+        topic:
+          type: string
+        tone:
+          type: string
+        length:
+          type: string
+        content:
+          type: string
+        hashtags:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+
+    XrayAnalysisInput:
+      type: object
+      required: [image_base64, filename]
+      properties:
+        image_base64:
+          type: string
+        filename:
+          type: string
+        scanner_type:
+          type: string
+          enum: [baggage, cargo, vehicle, body, general]
+        context:
+          type: ["string", "null"]
+
+    XrayAnalysis:
+      type: object
+      required: [id, filename, scanner_type, findings, created_at]
+      properties:
+        id:
+          type: string
+        filename:
+          type: string
+        scanner_type:
+          type: string
+        findings:
+          type: string
+        threat_level:
+          type: string
+          enum: [clear, low, medium, high, critical]
+        recommendations:
+          type: array
+          items:
+            type: string
+        image_url:
+          type: ["string", "null"]
+        created_at:
+          type: string
+
+    RagDocumentInput:
+      type: object
+      required: [content, filename]
+      properties:
+        content:
+          type: string
+        filename:
+          type: string
+        document_type:
+          type: string
+          enum: [manual, procedure, regulation, training, other]
+
+    RagDocument:
+      type: object
+      required: [id, filename, document_type, created_at]
+      properties:
+        id:
+          type: string
+        filename:
+          type: string
+        document_type:
+          type: string
+        content_preview:
+          type: string
+        word_count:
+          type: integer
+        created_at:
+          type: string
+
+    RagDocumentUpdate:
+      type: object
+      properties:
+        filename:
+          type: ["string", "null"]
+        document_type:
+          type: ["string", "null"]
+        content:
+          type: ["string", "null"]
+
+    ResearchMode:
+      type: object
+      required: [id, label]
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+
+    ResearchInput:
+      type: object
+      required: [mode, topic]
+      properties:
+        mode:
+          type: string
+          enum:
+            - paper_ieee
+            - paper_elsevier
+            - literature_review
+            - research_ideas
+            - research_gaps
+            - experiment_plan
+            - patent_analysis
+            - technical_report
+            - security_algorithm
+        topic:
+          type: string
+        context:
+          type: ["string", "null"]
+        keywords:
+          type: array
+          items:
+            type: string
+        word_count:
+          type: ["integer", "null"]
+
+    ResearchOutput:
+      type: object
+      required: [id, mode, mode_label, topic, content, word_count, created_at]
+      properties:
+        id:
+          type: string
+        mode:
+          type: string
+        mode_label:
+          type: string
+        topic:
+          type: string
+        content:
+          type: string
+        word_count:
+          type: integer
+        created_at:
+          type: string

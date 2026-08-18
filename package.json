@@ -1,0 +1,23 @@
+{
+  "name": "workspace",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
+    "build": "pnpm run typecheck && pnpm -r --if-present run build",
+    "typecheck:libs": "tsc --build",
+    "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck",
+    "start:launcher": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\\start-local.ps1",
+    "stop:launcher": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts\\stop-local.ps1"
+  },
+  "private": true,
+  "dependencies": {
+    "@replit/connectors-sdk": "^0.4.1"
+  },
+  "devDependencies": {
+    "@rollup/rollup-win32-x64-msvc": "^4.62.2",
+    "prettier": "^3.9.4",
+    "typescript": "~5.9.3"
+  },
+  "packageManager": "pnpm@11.13.1+sha512.b2fc7683b8a6525414e7d13e1ba28caaddde96bf66ec540bfaeb7e702b81f3e0be4d1f295edf7f9fe0396740a8dce4509c582ddf79891f4543fea32d37645f25"
+}

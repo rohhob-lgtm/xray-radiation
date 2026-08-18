@@ -1,0 +1,121 @@
+# Render Blueprint — one-click-ish deploy of the Translation Studio.
+# In Render: New → Blueprint → connect this repo. Render reads this file, builds
+# the Dockerfile, attaches a persistent disk, and prompts for the secret values
+# marked `sync: false` (ADMIN_KEY + provider API keys).
+services:
+  - type: web
+    name: xray-radiation
+    env: docker
+    plan: starter                 # ~$7/mo, always-on (free tier sleeps)
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /
+    disk:
+      name: data
+      mountPath: /app/backend/data
+      sizeGB: 10                   # headroom for an upload flood; peak is hard-
+                                   # bounded by MAX_RETAINED_PROJECTS below
+    envVars:
+      - key: PORT
+        value: "8000"
+      # Persist the SQLite DB (glossary, memory, projects, outputs) on the disk.
+      - key: DATABASE_URL
+        value: sqlite:////app/backend/data/radiation.db
+      # Production hardening: disables the interactive API docs, forces
+      # Secure + SameSite=strict session cookies, always emits HSTS, and runs
+      # the fail-fast secret validation at boot.
+      - key: ENVIRONMENT
+        value: "production"
+      # The site is intentionally open (no user auth) for the free launch, so
+      # DISABLE_AUTH=true is a deliberate choice, not a misconfiguration. This
+      # flag lets it run in production mode without aborting boot. The cost
+      # guard, upload content-safety guard, and rate limits are the protection.
+      - key: ALLOW_OPEN_ACCESS
+        value: "true"
+      # Lock CORS to the site's own origin (no wildcard).
+      - key: CORS_ALLOW_ORIGINS
+        value: "https://xray-radiation.onrender.com"
+      # ── Google sign-in + free-tier quotas ──────────────────────────────────
+      # Off for now: the site stays fully open while we measure demand. Flip to
+      # "true" (after setting the two GOOGLE_* secrets below) to switch on the
+      # tiered model: 1 free job for anonymous visitors, 5 after Google sign-in.
+      - key: AUTH_ENABLED
+        value: "false"
+      - key: PUBLIC_BASE_URL
+        value: "https://xray-radiation.onrender.com"
+      - key: ANON_FREE_TRANSLATIONS
+        value: "1"
+      - key: ACCOUNT_FREE_TRANSLATIONS
+        value: "5"
+      - key: GOOGLE_CLIENT_ID
+        sync: false               # from Google Cloud Console (OAuth client)
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false               # from Google Cloud Console (OAuth client)
+      # Open site, no user auth yet — but force the cost guard ON (see gotcha).
+      - key: DISABLE_AUTH
+        value: "true"
+      - key: DEVELOPMENT_MODE
+        value: "false"
+      - key: TRANSLATION_LOCALHOST_UNLIMITED
+        value: "false"
+      - key: DISABLE_DAILY_QUOTA
+        value: "false"
+      - key: DISABLE_MONTHLY_QUOTA
+        value: "false"
+      - key: DISABLE_HOURLY_QUOTA
+        value: "false"
+      - key: DISABLE_TRANSLATION_RATE_LIMIT
+        value: "false"
+      # Default translation engine = Gemini (cheapest; free tier). Ensures the
+      # public "auto" path uses Gemini on a fresh server DB.
+      - key: ACTIVE_PROVIDER
+        value: gemini
+      - key: GEMINI_MODEL
+        value: gemini-3.1-flash-lite
+      # Cheapest OpenAI models if an OpenAI key is set instead.
+      - key: OPENAI_TRANSLATION_MODEL
+        value: gpt-4o-mini
+      - key: OPENAI_REVIEW_MODEL
+        value: gpt-4o-mini
+      # Cost + abuse ceilings (free-launch values).
+      - key: MAX_COST_PER_JOB_USD
+        value: "0.50"
+      - key: MAX_DAILY_API_COST_USD
+        value: "3"
+      - key: MAX_MONTHLY_API_COST_USD
+        value: "40"
+      - key: MAX_REQUESTS_PER_USER_PER_HOUR
+        value: "40"
+      - key: MAX_CONCURRENT_TRANSLATIONS
+        value: "2"
+      - key: MAX_FILE_SIZE_MB
+        value: "25"
+      - key: MAX_SEGMENTS_PER_JOB
+        value: "1500"
+      - key: MAX_CHARS_PER_JOB
+        value: "200000"
+      - key: CONFIRM_SEGMENTS_THRESHOLD
+        value: "200"
+      - key: CONFIRM_CHARS_THRESHOLD
+        value: "60000"
+      - key: PROJECT_RETENTION_HOURS
+        value: "12"
+      - key: MAX_RETAINED_PROJECTS
+        value: "300"
+      - key: RETENTION_SWEEP_SECONDS
+        value: "600"
+      - key: RATE_LIMIT_REQUESTS
+        value: "600"
+      - key: RATE_LIMIT_AUTH_REQUESTS
+        value: "120"
+      # Auto-generated strong session secret.
+      - key: SESSION_SECRET
+        generateValue: true
+      # ── Secrets — set these in the Render dashboard (never committed) ──
+      - key: ADMIN_KEY
+        sync: false               # your admin unlock key
+      - key: OPENAI_API_KEY
+        sync: false               # for gpt-4o-mini (cheapest); or use GEMINI
+      - key: GEMINI_API_KEY
+        sync: false               # optional cheap alternative
+      - key: ANTHROPIC_API_KEY
+        sync: false               # optional (ai engine = Claude)

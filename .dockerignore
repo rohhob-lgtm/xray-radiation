@@ -1,0 +1,22 @@
+# Keep the build context small and never ship secrets or local state.
+**/node_modules
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+**/dist
+**/.replit-artifact
+.git
+.gitignore
+**/*.db
+**/*.db-journal
+**/*.log
+backend/.env
+.env
+backups
+debug
+screenshots
+attached_assets
+uploads
+**/*.docx
+**/*.pptx

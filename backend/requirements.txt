@@ -1,0 +1,60 @@
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+python-multipart==0.0.12
+httpx==0.27.2
+pydantic==2.9.2
+pydantic-settings==2.6.1
+python-dotenv==1.0.1
+Pillow==11.0.0
+openai==1.54.4
+anthropic>=0.40.0
+aiofiles==24.1.0
+# Database
+sqlalchemy>=2.0.36
+psycopg2-binary>=2.9.9
+# Auth
+authlib>=1.3.0
+itsdangerous>=2.1.2
+# RAG & ML
+numpy>=1.24.0
+# Document parsing
+pypdf>=4.0.0
+pymupdf>=1.24.0
+# OCR for scanned PDFs (Translation Studio) — requires the system `tesseract`
+# binary + language data packs (tesseract-ocr-{eng,ara,rus,fra,spa}) to be
+# installed separately; pip only provides the Python wrapper.
+pytesseract>=0.3.10
+# Source-language auto-detection ("Auto Detect" in the Translation Studio)
+langdetect>=1.0.9
+# ColPali / visual RAG
+torch>=2.2.0
+colpali-engine>=0.3.7
+open-clip-torch>=2.24.0
+python-docx>=1.1.0
+python-pptx>=0.6.23
+weasyprint>=60.0
+reportlab>=4.0.0
+matplotlib>=3.8.0
+arabic-reshaper>=3.0.0
+python-bidi>=0.4.2
+# Excel
+openpyxl>=3.1.0
+# YAML parsing (workspace agent data-file processor)
+pyyaml>=6.0.0
+# Font metrics (real advance-width measurement for title overflow detection)
+fonttools>=4.50.0
+# Web crawling
+playwright>=1.40.0
+beautifulsoup4>=4.12.0
+lxml>=5.0.0
+# Utilities
+python-slugify>=8.0.0
+# Microsoft Word desktop COM automation (Windows-only, mandatory DOCX finalization pass)
+pywin32>=306; sys_platform == "win32"
+psutil>=5.9.0
+# Testing
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+# Connectors: SFTP / NAS (SMB) file-storage connectors
+asyncssh>=2.14.0
+smbprotocol>=1.13.0
