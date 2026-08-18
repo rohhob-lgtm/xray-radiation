@@ -73,6 +73,8 @@ class Settings(BaseSettings):
     rate_limit_window_s: int = 60          # window length in seconds
     rate_limit_auth_requests: int = 15     # tighter budget for auth/login paths
     rate_limit_auth_window_s: int = 60
+    rate_limit_ai_requests: int = 20       # tighter budget for the AI tutor (cost abuse)
+    rate_limit_ai_window_s: int = 60
 
     # Security response headers.
     enable_security_headers: bool = True

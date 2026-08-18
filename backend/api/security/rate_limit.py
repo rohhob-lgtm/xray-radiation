@@ -35,6 +35,10 @@ _EXEMPT_PREFIXES = ("/api/health", "/api/healthz", "/api/ready")
 # Auth-sensitive path fragments that get the stricter budget.
 _AUTH_PREFIXES = ("/api/login", "/api/callback", "/api/logout", "/api/auth")
 
+# AI endpoints (the tutor). Open + cost-bearing, so they get their own tight
+# per-IP budget to prevent "denial-of-wallet" abuse from running up AI spend.
+_AI_PREFIXES = ("/api/chat",)
+
 
 class _SlidingWindow:
     """Fixed-budget sliding-window counter keyed by an arbitrary string."""
@@ -79,9 +83,14 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self._auth = _SlidingWindow(
             settings.rate_limit_auth_requests, settings.rate_limit_auth_window_s
         )
+        self._ai = _SlidingWindow(
+            settings.rate_limit_ai_requests, settings.rate_limit_ai_window_s
+        )
         self._last_sweep = 0.0
         self._sweep_interval = max(
-            settings.rate_limit_window_s, settings.rate_limit_auth_window_s
+            settings.rate_limit_window_s,
+            settings.rate_limit_auth_window_s,
+            settings.rate_limit_ai_window_s,
         )
 
     async def dispatch(self, request: Request, call_next):
@@ -93,9 +102,13 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self._maybe_sweep(now)
 
         ip = client_ip(request)
-        is_auth = path.startswith(_AUTH_PREFIXES)
-        limiter = self._auth if is_auth else self._general
-        key = f"{'auth' if is_auth else 'gen'}:{ip}"
+        if path.startswith(_AI_PREFIXES):
+            scope, limiter = "ai", self._ai
+        elif path.startswith(_AUTH_PREFIXES):
+            scope, limiter = "auth", self._auth
+        else:
+            scope, limiter = "general", self._general
+        key = f"{scope}:{ip}"
 
         allowed, retry_after = limiter.check(key, now)
         if not allowed:
@@ -103,7 +116,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             log_security_event(
                 "rate_limit_exceeded",
                 request,
-                scope="auth" if is_auth else "general",
+                scope=scope,
                 retry_after=retry,
             )
             return JSONResponse(
@@ -120,3 +133,4 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self._last_sweep = now
         self._general.sweep(now)
         self._auth.sweep(now)
+        self._ai.sweep(now)
